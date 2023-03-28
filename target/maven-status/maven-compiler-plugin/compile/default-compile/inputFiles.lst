@@ -5,6 +5,8 @@
 /Users/mac/Desktop/CrudSpringBoot/src/main/java/com/example/crudspringboot/controller/AuthController.java
 /Users/mac/Desktop/CrudSpringBoot/src/main/java/com/example/crudspringboot/controller/OrderController.java
 /Users/mac/Desktop/CrudSpringBoot/src/main/java/com/example/crudspringboot/service/userInfo/UserInfoServiceImpl.java
+/Users/mac/Desktop/CrudSpringBoot/src/main/java/com/example/crudspringboot/dto/OrderItem.java
+/Users/mac/Desktop/CrudSpringBoot/src/main/java/com/example/crudspringboot/dto/OrderItemDto.java
 /Users/mac/Desktop/CrudSpringBoot/src/main/java/com/example/crudspringboot/dto/RegisterDto.java
 /Users/mac/Desktop/CrudSpringBoot/src/main/java/com/example/crudspringboot/model/Order.java
 /Users/mac/Desktop/CrudSpringBoot/src/main/java/com/example/crudspringboot/service/card/CardServiceImpl.java

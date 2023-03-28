@@ -71,4 +71,38 @@ public class OrderController {
             return new ResponseStatusException(HttpStatus.NOT_FOUND, "Заказ с id " + orderId + " не найден");
         }
     }
+
+    @PutMapping("/{id}")
+    public Object updateOrder(@PathVariable Long id, @RequestBody OrderDto orderDto) {
+        if (orderRepository.existsById(id)) {
+            Order order = orderRepository.findById(id).orElseThrow();
+            List<OrderItemDto> orderItemDtos = orderDto.getOrder();
+            List<OrderItem> orderItems = new ArrayList<>();
+            for (OrderItemDto orderItemDto : orderItemDtos) {
+                if (!cardRepository.existsById(orderItemDto.getProductId())) {
+                    return new ResponseStatusException(HttpStatus.NOT_FOUND, "Нет продукта " + orderItemDto.getProductId());
+                }
+                OrderItem orderItem = new OrderItem();
+                orderItem.setProductId(orderItemDto.getProductId());
+                orderItem.setQuantity(orderItemDto.getQuantity());
+                orderItems.add(orderItem);
+            }
+            order.setOrder(orderItems);
+            orderRepository.save(order);
+            return new ResponseEntity<>(orderDto, HttpStatus.OK);
+        } else {
+            return new ResponseStatusException(HttpStatus.NOT_FOUND, "Нет заказа " + id);
+        }
+    }
+
+    @DeleteMapping("/{orderId}")
+    public Object deleteOrder(@PathVariable Long orderId) {
+        Optional<Order> orderOptional = orderRepository.findById(orderId);
+        if (orderOptional.isPresent()) {
+            orderRepository.deleteById(orderId);
+            return new ResponseEntity<>(orderId, HttpStatus.OK);
+        } else {
+            return new ResponseStatusException(HttpStatus.NOT_FOUND, "Заказ с id " + orderId + " не найден");
+        }
+    }
 }
