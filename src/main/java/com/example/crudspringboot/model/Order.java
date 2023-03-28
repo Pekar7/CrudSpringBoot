@@ -1,9 +1,9 @@
 package com.example.crudspringboot.model;
 
+import com.example.crudspringboot.dto.OrderItem;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -12,13 +12,13 @@ import java.util.List;
 public class Order {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
 
     @Column(name = "user_id")
     private Long userId;
 
-    @Column(name = "card_id")
-    @ElementCollection
-    private List<Long> cardsid = new ArrayList<>();
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "order_item", joinColumns = @JoinColumn(name = "order_id"))
+    private List<OrderItem> order;
+
 }

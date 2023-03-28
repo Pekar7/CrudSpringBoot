@@ -7,5 +7,5 @@ import java.util.List;
 @Data
 public class OrderDto {
     private Long userId;
-    private List<Long> productsId;
+    private List<OrderItemDto> order;
 }

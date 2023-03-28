@@ -1,6 +1,8 @@
 package com.example.crudspringboot.controller;
 
 import com.example.crudspringboot.dto.OrderDto;
+import com.example.crudspringboot.dto.OrderItem;
+import com.example.crudspringboot.dto.OrderItemDto;
 import com.example.crudspringboot.model.Order;
 import com.example.crudspringboot.model.UserInfo;
 import com.example.crudspringboot.service.card.CardRepository;
@@ -12,8 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @CrossOrigin
 @RestController
@@ -33,31 +34,41 @@ public class OrderController {
 
     @PostMapping()
     public Object addOrder(@RequestBody OrderDto orderDto) {
-        List<Long> orders = new ArrayList<>();
         if (userInfoRepository.existsById(orderDto.getUserId())) {
             UserInfo userInfo = userInfoRepository.findById(orderDto.getUserId());
-            List<Long> ordersDto = orderDto.getProductsId();
-            for (int i = 0; i < ordersDto.size(); i++) {
-                if (cardRepository.existsById(ordersDto.get(i))) {
-                    orders.add(ordersDto.get(i));
-                } else {
-                    return new ResponseStatusException(HttpStatus.BAD_REQUEST, "Нет такого продукта " + ordersDto.get(i));
+
+            List<OrderItemDto> orderItemDtos = orderDto.getOrder();
+            List<OrderItem> orderItems = new ArrayList<>();
+            for (OrderItemDto orderItemDto : orderItemDtos) {
+                if (!cardRepository.existsById(orderItemDto.getProductId())) {
+                    return new ResponseStatusException(HttpStatus.NOT_FOUND, "Нет продукта " + orderItemDto.getProductId());
                 }
+                OrderItem orderItem = new OrderItem();
+                orderItem.setProductId(orderItemDto.getProductId());
+                orderItem.setQuantity(orderItemDto.getQuantity());
+                orderItems.add(orderItem);
             }
+
             Order order = new Order();
+            order.setId((long) userInfo.getId());
             order.setUserId((long) userInfo.getId());
-            order.setCardsid(orders);
+            order.setOrder(orderItems);
             orderRepository.save(order);
+
+            return new ResponseEntity<>(orderDto, HttpStatus.OK);
+        } else {
+            return new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь с id "+orderDto.getUserId()+" не найден" );
+        }
+    }
+
+    @GetMapping("/{orderId}")
+    public Object getOrder(@PathVariable Long orderId) {
+        Optional<Order> orderOptional = orderRepository.findById(orderId);
+        if (orderOptional.isPresent()) {
+            Order order = orderOptional.get();
             return new ResponseEntity<>(order, HttpStatus.OK);
         } else {
-            return new ResponseStatusException(HttpStatus.BAD_REQUEST, "Нет такого пользователя " + orderDto.getUserId());
+            return new ResponseStatusException(HttpStatus.NOT_FOUND, "Заказ с id " + orderId + " не найден");
         }
-
     }
-
-    @GetMapping()
-    public Object getOrders() {
-        return orderRepository.findAll();
-    }
-
 }
